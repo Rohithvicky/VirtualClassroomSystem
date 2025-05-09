@@ -56,6 +56,69 @@ public class DataManager {
         }
     }
 
+    // Update a class in the database
+    public boolean updateClass(String oldClassName, String newClassName, String meetLink, int teacherId) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "UPDATE classes SET title = ?, meet_link = ? WHERE title = ? AND created_by = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, newClassName);
+            stmt.setString(2, meetLink);
+            stmt.setString(3, oldClassName);
+            stmt.setInt(4, teacherId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Database error when updating class: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Delete a class from the database
+    public boolean deleteClass(String className) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "DELETE FROM classes WHERE title = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, className);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Database error when deleting class: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     // Add a quiz to the database
     public boolean addQuiz(String quizTitle, int classId, LocalDate dueDate) {
         Connection conn = null;
