@@ -228,21 +228,22 @@ public class DataManager {
         return getQuizQuestions(quizId);
     }
 
-    // NEW: Get all classes as a list of display strings (removed Course.java usage)
-    public List<String> getClasses() {
-        List<String> classes = new ArrayList<>();
+    // NEW: Get all classes as a list of Course objects
+    public List<Course> getClassesObj() {
+        List<Course> courses = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = DBConnection.getConnection();
-            String sql = "SELECT title, meet_link FROM classes";
+            String sql = "SELECT id, title, meet_link FROM classes";
             stmt = conn.prepareStatement(sql);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                String title = rs.getString("title");
-                String meetLink = rs.getString("meet_link");
-                classes.add(title + " - Meet: " + meetLink);
+                courses.add(new Course(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("meet_link")));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
@@ -261,7 +262,7 @@ public class DataManager {
                 e.printStackTrace();
             }
         }
-        return classes;
+        return courses;
     }
 
     // Get classes for a specific student as display strings

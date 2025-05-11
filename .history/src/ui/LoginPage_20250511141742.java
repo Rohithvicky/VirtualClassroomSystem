@@ -126,7 +126,8 @@ public class LoginPage extends JFrame {
             String password = new String(passwordField.getPassword()).trim();
             if (username.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(LoginPage.this,
-                        "Please enter both username and password", "Error", JOptionPane.ERROR_MESSAGE);
+                        "Please enter both username and password",
+                        "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             try {
@@ -134,14 +135,14 @@ public class LoginPage extends JFrame {
                 if (user != null) {
                     openDashboard(user);
                 } else {
-                    // Debug output to console (remove in production)
-                    System.out.println("DEBUG: Login failed for user: " + username);
                     JOptionPane.showMessageDialog(LoginPage.this,
-                            "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+                            "Invalid username or password",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(LoginPage.this,
-                        "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        "Database error: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });
@@ -152,7 +153,7 @@ public class LoginPage extends JFrame {
         footerPanel.setBackground(new Color(245, 245, 245));
         footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // "Don't have an account? Register" link/button
+        // Optional: You can add a "Don't have an account? Register" link/button here.
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel registerPrompt = new JLabel("Don't have an account?");
         registerPrompt.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -192,16 +193,10 @@ public class LoginPage extends JFrame {
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);
-
-            // Debug output: display query details in console
-            System.out.println("DEBUG: Executing query with username: " + username);
-
             rs = stmt.executeQuery();
             if (rs.next()) {
                 int id = rs.getInt("id");
                 String role = rs.getString("role");
-                // Debug output: user authenticated
-                System.out.println("DEBUG: User authenticated: " + username + ", role: " + role);
                 return new User(id, username, role);
             }
             return null;

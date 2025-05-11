@@ -614,8 +614,9 @@ public class TeacherDashboard extends JFrame {
     private void loadData() {
         DataManager dm = DataManager.getInstance();
         classListModel.clear();
-        // Use the getClasses() method that returns a list of display strings
-        dm.getClasses().forEach(classListModel::addElement);
+        // Update this call to use getClassesObj() and convert Course objects to display
+        // strings
+        dm.getClassesObj().forEach(course -> classListModel.addElement(course.getDisplayTitle()));
         loadQuizzesFromDatabase();
         assignmentListModel.clear();
         dm.getAssignments().forEach(assignmentListModel::addElement);

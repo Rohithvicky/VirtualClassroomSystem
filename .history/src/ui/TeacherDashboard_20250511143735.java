@@ -3,8 +3,8 @@ package ui;
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -39,11 +39,12 @@ public class TeacherDashboard extends JFrame {
         }
 
         initializeComponents();
-        loadData();
+        loadData(); // Load data from the database
         setVisible(true);
     }
 
     private void initializeComponents() {
+        // Set up the main layout
         setLayout(new BorderLayout());
 
         // Create header panel with user info and logout button
@@ -60,7 +61,7 @@ public class TeacherDashboard extends JFrame {
         JPanel quizzesPanel = createQuizzesPanel();
         JPanel assignmentsPanel = createAssignmentsPanel();
 
-        // Add icons to tabs with safe fallback
+        // Add icons to tabs
         ImageIcon classIcon = createIcon("class_icon.png", "Class");
         ImageIcon quizIcon = createIcon("quiz_icon.png", "Quiz");
         ImageIcon assignmentIcon = createIcon("assignment_icon.png", "Assignment");
@@ -68,6 +69,7 @@ public class TeacherDashboard extends JFrame {
         tabbedPane.addTab("Classes", classIcon, classesPanel);
         tabbedPane.addTab("Quizzes", quizIcon, quizzesPanel);
         tabbedPane.addTab("Assignments", assignmentIcon, assignmentsPanel);
+        // Add tabbed pane to main frame
         add(tabbedPane, BorderLayout.CENTER);
 
         // Add status bar at the bottom
@@ -79,7 +81,7 @@ public class TeacherDashboard extends JFrame {
         try {
             return new ImageIcon(Objects.requireNonNull(getClass().getResource("/icons/" + path)));
         } catch (Exception e) {
-            System.err.println("Icon not found for " + path + ". Using fallback: " + fallback);
+            // If icon not found, return null (no icon will be displayed)
             return null;
         }
     }
@@ -89,26 +91,30 @@ public class TeacherDashboard extends JFrame {
         headerPanel.setBackground(primaryColor);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
+        // Welcome message with user info
         JLabel welcomeLabel = new JLabel("Welcome, " + user.getUsername() + "!");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         welcomeLabel.setForeground(Color.WHITE);
 
-        // Create logout button
-        JButton logoutButton = createStyledButton("Logout", new Color(220, 53, 69));
+        // Create logout button using the createStyledButton method
+        JButton logoutButton = createStyledButton("Logout", new Color(220, 53, 69)); // Red color for logout
+
         logoutButton.addActionListener(e -> {
-            System.out.println("DEBUG: Logout initiated for " + user.getUsername());
             int choice = JOptionPane.showConfirmDialog(this,
                     "Are you sure you want to logout?",
                     "Confirm Logout",
                     JOptionPane.YES_NO_OPTION);
+
             if (choice == JOptionPane.YES_OPTION) {
-                dispose();
-                new LoginPage().setVisible(true);
+                dispose(); // Close this window
+                new LoginPage().setVisible(true); // Open login form
             }
         });
 
+        // Add components to header panel
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
         headerPanel.add(logoutButton, BorderLayout.EAST);
+
         return headerPanel;
     }
 
@@ -117,50 +123,60 @@ public class TeacherDashboard extends JFrame {
         panel.setBackground(backgroundColor);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Title panel
+        // Create title panel
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(backgroundColor);
+
         JLabel titleLabel = new JLabel("Manage Your Classes");
         titleLabel.setFont(titleFont);
         titleLabel.setForeground(primaryColor);
         titlePanel.add(titleLabel, BorderLayout.WEST);
 
-        // List panel for classes
+        // Create list panel
         classListModel = new DefaultListModel<>();
         JList<String> classList = new JList<>(classListModel);
         classList.setFont(regularFont);
         classList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         classList.setFixedCellHeight(40);
         classList.setCellRenderer(new CustomListCellRenderer());
+
         JScrollPane scrollPane = new JScrollPane(classList);
         scrollPane.setBorder(BorderFactory.createLineBorder(accentColor, 1));
 
-        // Button panel for class actions
+        // Create button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         buttonPanel.setBackground(backgroundColor);
+
         JButton addClassButton = createStyledButton("Add Class", accentColor);
         JButton editClassButton = createStyledButton("Edit Class", accentColor);
         JButton deleteClassButton = createStyledButton("Delete Class", accentColor);
 
+        buttonPanel.add(addClassButton);
+        buttonPanel.add(editClassButton);
+        buttonPanel.add(deleteClassButton);
+
+        // Add action listeners
         addClassButton.addActionListener(e -> {
             JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 10));
-            JTextField classNameField = new JTextField();
-            JTextField meetLinkField = new JTextField();
+            JTextField className = new JTextField();
+            JTextField meetLink = new JTextField();
+
             inputPanel.add(new JLabel("Class Name:"));
-            inputPanel.add(classNameField);
+            inputPanel.add(className);
             inputPanel.add(new JLabel("Google Meet Link:"));
-            inputPanel.add(meetLinkField);
+            inputPanel.add(meetLink);
+
             int result = JOptionPane.showConfirmDialog(this, inputPanel,
                     "Add New Class", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION && !classNameField.getText().trim().isEmpty()) {
+
+            if (result == JOptionPane.OK_OPTION && !className.getText().trim().isEmpty()) {
                 boolean success = DataManager.getInstance().addClass(
-                        classNameField.getText().trim(),
-                        meetLinkField.getText().trim(),
+                        className.getText().trim(),
+                        meetLink.getText().trim(),
                         user.getId());
+
                 if (success) {
-                    String display = classNameField.getText().trim() + " - Meet: " + meetLinkField.getText().trim();
-                    classListModel.addElement(display);
-                    System.out.println("DEBUG: Class added: " + display);
+                    classListModel.addElement(className.getText() + " - Meet: " + meetLink.getText());
                     JOptionPane.showMessageDialog(this,
                             "Class added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
@@ -177,26 +193,28 @@ public class TeacherDashboard extends JFrame {
                 String[] parts = selected.split(" - Meet: ");
                 String currentClassName = parts[0];
                 String currentMeetLink = parts.length > 1 ? parts[1] : "";
+
                 JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 10));
-                JTextField classNameField = new JTextField(currentClassName);
-                JTextField meetLinkField = new JTextField(currentMeetLink);
+                JTextField className = new JTextField(currentClassName);
+                JTextField meetLink = new JTextField(currentMeetLink);
+
                 inputPanel.add(new JLabel("Class Name:"));
-                inputPanel.add(classNameField);
+                inputPanel.add(className);
                 inputPanel.add(new JLabel("Google Meet Link:"));
-                inputPanel.add(meetLinkField);
+                inputPanel.add(meetLink);
+
                 int result = JOptionPane.showConfirmDialog(this, inputPanel,
                         "Edit Class", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-                if (result == JOptionPane.OK_OPTION && !classNameField.getText().trim().isEmpty()) {
+
+                if (result == JOptionPane.OK_OPTION && !className.getText().trim().isEmpty()) {
                     boolean success = DataManager.getInstance().updateClass(
-                            currentClassName,
-                            classNameField.getText().trim(),
-                            meetLinkField.getText().trim(),
+                            currentClassName, // Pass the old class name to identify the record
+                            className.getText().trim(),
+                            meetLink.getText().trim(),
                             user.getId());
+
                     if (success) {
-                        String updatedDisplay = classNameField.getText().trim() + " - Meet: "
-                                + meetLinkField.getText().trim();
-                        classListModel.set(selectedIndex, updatedDisplay);
-                        System.out.println("DEBUG: Class updated to: " + updatedDisplay);
+                        classListModel.set(selectedIndex, className.getText() + " - Meet: " + meetLink.getText());
                         JOptionPane.showMessageDialog(this,
                                 "Class updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -218,16 +236,18 @@ public class TeacherDashboard extends JFrame {
                 int confirm = JOptionPane.showConfirmDialog(this,
                         "Are you sure you want to delete: " + selected + "?",
                         "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
                 if (confirm == JOptionPane.YES_OPTION) {
                     boolean success = DataManager.getInstance().deleteClass(selected.split(" - Meet: ")[0]);
                     if (success) {
                         classListModel.remove(selectedIndex);
-                        System.out.println("DEBUG: Class deleted: " + selected);
                         JOptionPane.showMessageDialog(this,
-                                "Class deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                "Class deleted successfully!",
+                                "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(this,
-                                "Failed to delete class.", "Error", JOptionPane.ERROR_MESSAGE);
+                                "Failed to delete class.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             } else {
@@ -237,9 +257,11 @@ public class TeacherDashboard extends JFrame {
             }
         });
 
+        // Add components to panel
         panel.add(titlePanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
+
         return panel;
     }
 
@@ -248,53 +270,69 @@ public class TeacherDashboard extends JFrame {
         panel.setBackground(backgroundColor);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Title panel
+        // Create title panel
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(backgroundColor);
+
         JLabel titleLabel = new JLabel("Manage Your Quizzes");
         titleLabel.setFont(titleFont);
         titleLabel.setForeground(primaryColor);
         titlePanel.add(titleLabel, BorderLayout.WEST);
 
-        // Create list panel for quizzes
+        // Create list panel
         quizListModel = new DefaultListModel<>();
         JList<String> quizList = new JList<>(quizListModel);
         quizList.setFont(regularFont);
         quizList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         quizList.setFixedCellHeight(40);
         quizList.setCellRenderer(new CustomListCellRenderer());
+
         JScrollPane scrollPane = new JScrollPane(quizList);
         scrollPane.setBorder(BorderFactory.createLineBorder(accentColor, 1));
 
+        // Load quizzes from the database
         loadQuizzesFromDatabase();
 
-        // Button panel for quiz actions
+        // Create button panel with four buttons: Add Quiz, Add Question, View
+        // Questions, Delete Quiz.
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         buttonPanel.setBackground(backgroundColor);
+
         JButton addQuizButton = createStyledButton("Add Quiz", accentColor);
         JButton addQuestionButton = createStyledButton("Add Question", accentColor);
         JButton viewQuestionsButton = createStyledButton("View Questions", accentColor);
         JButton deleteQuizButton = createStyledButton("Delete Quiz", accentColor);
 
+        buttonPanel.add(addQuizButton);
+        buttonPanel.add(addQuestionButton);
+        buttonPanel.add(viewQuestionsButton);
+        buttonPanel.add(deleteQuizButton);
+
+        // Add Quiz button functionality
         addQuizButton.addActionListener(e -> {
             JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 10));
             JTextField quizTitleField = new JTextField();
+            // Use a spinner for due date offset in days
             JSpinner dueDateSpinner = new JSpinner(new SpinnerNumberModel(7, 1, 60, 1));
+
             inputPanel.add(new JLabel("Quiz Title:"));
             inputPanel.add(quizTitleField);
             inputPanel.add(new JLabel("Due in (days):"));
             inputPanel.add(dueDateSpinner);
+
             int result = JOptionPane.showConfirmDialog(this, inputPanel,
                     "Add New Quiz", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
             if (result == JOptionPane.OK_OPTION && !quizTitleField.getText().trim().isEmpty()) {
                 LocalDate dueDate = LocalDate.now().plusDays((int) dueDateSpinner.getValue());
-                int classId = -1; // Use -1 if no specific class is selected
-                boolean success = DataManager.getInstance().addQuiz(
-                        quizTitleField.getText().trim(), classId, dueDate);
+                // Call DataManager.addQuiz with teacher's class ID.
+                // For this example, we assume that if no specific class is selected, we use -1.
+                // In practice, you might need additional UI to select a class.
+                int classId = -1;
+                boolean success = DataManager.getInstance().addQuiz(quizTitleField.getText().trim(), classId, dueDate);
                 if (success) {
-                    String display = quizTitleField.getText().trim() + " - Due: " + dueDate;
-                    quizListModel.addElement(display);
-                    System.out.println("DEBUG: Quiz added: " + display);
+                    // Update quiz list with a consistent format e.g., "QuizTitle - Due: 2025-05-18"
+                    quizListModel.addElement(quizTitleField.getText().trim() + " - Due: " + dueDate);
                     JOptionPane.showMessageDialog(this,
                             "Quiz added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
@@ -307,11 +345,14 @@ public class TeacherDashboard extends JFrame {
             }
         });
 
+        // Add Question button functionality
         addQuestionButton.addActionListener(e -> {
             int selectedIndex = quizList.getSelectedIndex();
             if (selectedIndex >= 0) {
                 String selectedQuiz = quizListModel.getElementAt(selectedIndex).split(" - Due: ")[0];
-                int quizId = DataManager.getInstance().getQuizIdByTitle(selectedQuiz);
+                int quizId = DataManager.getInstance().getQuizIdByTitle(selectedQuiz); // Fetch the quiz ID using the
+                                                                                       // title
+
                 JPanel inputPanel = new JPanel(new GridLayout(6, 2, 5, 10));
                 JTextField questionField = new JTextField();
                 JTextField optionAField = new JTextField();
@@ -319,6 +360,7 @@ public class TeacherDashboard extends JFrame {
                 JTextField optionCField = new JTextField();
                 JTextField optionDField = new JTextField();
                 JComboBox<String> correctOptionSelector = new JComboBox<>(new String[] { "A", "B", "C", "D" });
+
                 inputPanel.add(new JLabel("Question:"));
                 inputPanel.add(questionField);
                 inputPanel.add(new JLabel("Option A:"));
@@ -331,8 +373,10 @@ public class TeacherDashboard extends JFrame {
                 inputPanel.add(optionDField);
                 inputPanel.add(new JLabel("Correct Option:"));
                 inputPanel.add(correctOptionSelector);
+
                 int result = JOptionPane.showConfirmDialog(this, inputPanel,
                         "Add New Question", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
                 if (result == JOptionPane.OK_OPTION && !questionField.getText().trim().isEmpty()) {
                     String question = questionField.getText().trim();
                     String optionA = optionAField.getText().trim();
@@ -340,10 +384,12 @@ public class TeacherDashboard extends JFrame {
                     String optionC = optionCField.getText().trim();
                     String optionD = optionDField.getText().trim();
                     String correctOption = correctOptionSelector.getSelectedItem().toString();
+
+                    // Call addQuizQuestion with the quiz ID instead of the title
                     boolean success = DataManager.getInstance().addQuizQuestion(
                             quizId, question, optionA, optionB, optionC, optionD, correctOption);
+
                     if (success) {
-                        System.out.println("DEBUG: Question added for quiz: " + selectedQuiz);
                         JOptionPane.showMessageDialog(this,
                                 "Question added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -362,6 +408,7 @@ public class TeacherDashboard extends JFrame {
             }
         });
 
+        // View Questions button functionality
         viewQuestionsButton.addActionListener(e -> {
             int selectedIndex = quizList.getSelectedIndex();
             if (selectedIndex >= 0) {
@@ -378,8 +425,10 @@ public class TeacherDashboard extends JFrame {
                     questionArea.setEditable(false);
                     questionArea.setFont(regularFont);
                     questionArea.setText(String.join("\n\n", questions));
+
                     JScrollPane questionScrollPane = new JScrollPane(questionArea);
                     questionScrollPane.setPreferredSize(new Dimension(400, 300));
+
                     JOptionPane.showMessageDialog(this, questionScrollPane,
                             "Quiz Questions for: " + selectedQuiz, JOptionPane.INFORMATION_MESSAGE);
                 } else {
@@ -394,6 +443,7 @@ public class TeacherDashboard extends JFrame {
             }
         });
 
+        // Delete Quiz button functionality
         deleteQuizButton.addActionListener(e -> {
             int selectedIndex = quizList.getSelectedIndex();
             if (selectedIndex >= 0) {
@@ -401,13 +451,14 @@ public class TeacherDashboard extends JFrame {
                 int confirm = JOptionPane.showConfirmDialog(this,
                         "Are you sure you want to delete: " + selected + "?",
                         "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
                 if (confirm == JOptionPane.YES_OPTION) {
                     boolean success = DataManager.getInstance().deleteQuiz(selected.split(" - Due: ")[0]);
                     if (success) {
                         quizListModel.remove(selectedIndex);
-                        System.out.println("DEBUG: Quiz deleted: " + selected);
                         JOptionPane.showMessageDialog(this,
-                                "Quiz deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                "Quiz deleted successfully!",
+                                "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(this,
                                 "Failed to delete quiz.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -420,9 +471,11 @@ public class TeacherDashboard extends JFrame {
             }
         });
 
+        // Add components to panel
         panel.add(titlePanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
+
         return panel;
     }
 
@@ -431,69 +484,83 @@ public class TeacherDashboard extends JFrame {
         panel.setBackground(backgroundColor);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Title panel
+        // Create title panel
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(backgroundColor);
+
         JLabel titleLabel = new JLabel("Manage Your Assignments");
         titleLabel.setFont(titleFont);
         titleLabel.setForeground(primaryColor);
         titlePanel.add(titleLabel, BorderLayout.WEST);
 
-        // List panel for assignments
+        // Create list panel
         assignmentListModel = new DefaultListModel<>();
         JList<String> assignmentList = new JList<>(assignmentListModel);
         assignmentList.setFont(regularFont);
         assignmentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         assignmentList.setFixedCellHeight(40);
         assignmentList.setCellRenderer(new CustomListCellRenderer());
+
         JScrollPane scrollPane = new JScrollPane(assignmentList);
         scrollPane.setBorder(BorderFactory.createLineBorder(accentColor, 1));
 
-        // Button panel for assignment actions
+        // Create button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         buttonPanel.setBackground(backgroundColor);
+
         JButton addAssignmentButton = createStyledButton("Add Assignment", accentColor);
         JButton deleteAssignmentButton = createStyledButton("Delete Assignment", accentColor);
 
+        buttonPanel.add(addAssignmentButton);
+        buttonPanel.add(deleteAssignmentButton);
+
+        // Add action listeners
         addAssignmentButton.addActionListener(e -> {
             JPanel inputPanel = new JPanel(new GridLayout(4, 2, 5, 10));
-            JTextField assignmentTitleField = new JTextField();
+            JTextField assignmentTitle = new JTextField();
             JComboBox<String> classSelector = new JComboBox<>();
             JSpinner dueDateSpinner = new JSpinner(new SpinnerNumberModel(14, 1, 60, 1));
             JTextArea descriptionArea = new JTextArea(3, 20);
             descriptionArea.setLineWrap(true);
             descriptionArea.setWrapStyleWord(true);
+
             // Populate class selector with actual class names
             classSelector.addItem("No Class");
             for (int i = 0; i < classListModel.getSize(); i++) {
                 String className = classListModel.getElementAt(i).split(" - ")[0];
                 classSelector.addItem(className);
             }
+
             inputPanel.add(new JLabel("Assignment Title:"));
-            inputPanel.add(assignmentTitleField);
+            inputPanel.add(assignmentTitle);
             inputPanel.add(new JLabel("Select Class (Optional):"));
             inputPanel.add(classSelector);
             inputPanel.add(new JLabel("Due in (days):"));
             inputPanel.add(dueDateSpinner);
             inputPanel.add(new JLabel("Description:"));
             inputPanel.add(new JScrollPane(descriptionArea));
+
             int result = JOptionPane.showConfirmDialog(this, inputPanel,
                     "Add New Assignment", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION && !assignmentTitleField.getText().trim().isEmpty()) {
+
+            if (result == JOptionPane.OK_OPTION && !assignmentTitle.getText().trim().isEmpty()) {
                 LocalDate dueDate = LocalDate.now().plusDays((int) dueDateSpinner.getValue());
                 String selectedClass = classSelector.getSelectedItem().toString();
                 String description = descriptionArea.getText().trim();
+
+                // Determine class ID (-1 if no class is selected)
                 int classId = selectedClass.equals("No Class") ? -1
                         : DataManager.getInstance().getClassIdByName(selectedClass);
+
+                // Use the overloaded method that accepts a description parameter
                 boolean success = DataManager.getInstance().addAssignment(
-                        assignmentTitleField.getText().trim(),
+                        assignmentTitle.getText().trim(),
                         classId,
                         dueDate,
                         description);
+
                 if (success) {
-                    String display = assignmentTitleField.getText().trim() + " - Due: " + dueDate;
-                    assignmentListModel.addElement(display);
-                    System.out.println("DEBUG: Assignment added: " + display);
+                    assignmentListModel.addElement(assignmentTitle.getText() + " - Due: " + dueDate);
                     JOptionPane.showMessageDialog(this,
                             "Assignment added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
@@ -502,7 +569,8 @@ public class TeacherDashboard extends JFrame {
                 }
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "Please fill in all required fields.", "Incomplete Data", JOptionPane.WARNING_MESSAGE);
+                        "Please fill in all required fields.",
+                        "Incomplete Data", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -513,28 +581,33 @@ public class TeacherDashboard extends JFrame {
                 int confirm = JOptionPane.showConfirmDialog(this,
                         "Are you sure you want to delete: " + selected + "?",
                         "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
                 if (confirm == JOptionPane.YES_OPTION) {
                     String assignmentTitle = selected.split(" - Due: ")[0];
                     boolean success = DataManager.getInstance().deleteAssignment(assignmentTitle);
                     if (success) {
                         assignmentListModel.remove(selectedIndex);
-                        System.out.println("DEBUG: Assignment deleted: " + selected);
                         JOptionPane.showMessageDialog(this,
-                                "Assignment deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                "Assignment deleted successfully!",
+                                "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(this,
-                                "Failed to delete assignment.", "Error", JOptionPane.ERROR_MESSAGE);
+                                "Failed to delete assignment.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "Please select an assignment to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                        "Please select an assignment to delete.",
+                        "No Selection", JOptionPane.WARNING_MESSAGE);
             }
         });
 
+        // Add components to panel
         panel.add(titlePanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
+
         return panel;
     }
 
@@ -544,31 +617,44 @@ public class TeacherDashboard extends JFrame {
         button.setBackground(color);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
+
+        // Add rounded corners and padding
         button.setBorder(new CompoundBorder(
-                BorderFactory.createLineBorder(color.darker(), 2),
-                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+                BorderFactory.createLineBorder(color.darker(), 2), // Darker border
+                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
+        ));
+
+        // Add hover effect
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(color.brighter());
+                button.setBackground(color.brighter()); // Lighter color on hover
                 button.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(color);
+                button.setBackground(color); // Original color
                 button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
+
+        // Add rounded corners using a custom UI
         button.setUI(new BasicButtonUI() {
             @Override
             public void paint(Graphics g, JComponent c) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Draw button background
                 g2.setColor(button.getBackground());
                 g2.fillRoundRect(0, 0, button.getWidth(), button.getHeight(), 20, 20);
+
+                // Draw button border
                 g2.setColor(color.darker());
                 g2.drawRoundRect(0, 0, button.getWidth() - 1, button.getHeight() - 1, 20, 20);
+
+                // Draw button text
                 FontMetrics fm = g2.getFontMetrics();
                 Rectangle stringBounds = fm.getStringBounds(button.getText(), g2).getBounds();
                 int textX = (button.getWidth() - stringBounds.width) / 2;
@@ -577,6 +663,7 @@ public class TeacherDashboard extends JFrame {
                 g2.drawString(button.getText(), textX, textY);
             }
         });
+
         return button;
     }
 
@@ -584,9 +671,12 @@ public class TeacherDashboard extends JFrame {
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBackground(new Color(237, 242, 247));
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        JLabel statusLabel = new JLabel("Connected to Virtual Classroom Server • " + LocalDate.now().toString());
+
+        JLabel statusLabel = new JLabel("Connected to Virtual Classroom Server • " +
+                LocalDate.now().toString());
         statusLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         statusLabel.setForeground(new Color(100, 100, 100));
+
         statusBar.add(statusLabel, BorderLayout.WEST);
         return statusBar;
     }
@@ -595,8 +685,11 @@ public class TeacherDashboard extends JFrame {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            JLabel label = (JLabel) super.getListCellRendererComponent(
+                    list, value, index, isSelected, cellHasFocus);
+
             label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
             if (isSelected) {
                 label.setBackground(accentColor);
                 label.setForeground(Color.WHITE);
@@ -607,6 +700,7 @@ public class TeacherDashboard extends JFrame {
                 label.setBackground(Color.WHITE);
                 label.setForeground(Color.BLACK);
             }
+
             return label;
         }
     }
@@ -614,7 +708,6 @@ public class TeacherDashboard extends JFrame {
     private void loadData() {
         DataManager dm = DataManager.getInstance();
         classListModel.clear();
-        // Use the getClasses() method that returns a list of display strings
         dm.getClasses().forEach(classListModel::addElement);
         loadQuizzesFromDatabase();
         assignmentListModel.clear();

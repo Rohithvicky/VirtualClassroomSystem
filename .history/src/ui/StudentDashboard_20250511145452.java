@@ -22,8 +22,8 @@ public class StudentDashboard extends JFrame {
     private User user;
 
     // Styling variables
-    private Color primaryColor = new Color(25, 100, 200); // Blue color (used for header, dashboard, etc.)
-    private Color accentColor = new Color(65, 135, 245); // Brighter blue if needed
+    private Color primaryColor = new Color(25, 100, 200); // Blue color for buttons & header
+    private Color accentColor = new Color(65, 135, 245); // Brighter blue if needed elsewhere
     private Color backgroundColor = new Color(240, 248, 255); // Alice blue
     private Font titleFont = new Font("Arial", Font.BOLD, 16);
     private Font regularFont = new Font("Arial", Font.PLAIN, 14);
@@ -127,9 +127,8 @@ public class StudentDashboard extends JFrame {
         leftPanel.add(welcomeLabel);
         headerPanel.add(leftPanel, BorderLayout.WEST);
 
-        // Right side - Logout button as red
-        // Using red color: new Color(220, 53, 69)
-        JButton logoutButton = createStyledButton("Logout", new Color(220, 53, 69));
+        // Right side - Logout button (buttons now use blue color)
+        JButton logoutButton = createStyledButton("Logout", primaryColor);
         try {
             logoutButton.setIcon(new ImageIcon(getClass().getResource("/icons/logout.png")));
         } catch (Exception ex) {
@@ -166,7 +165,7 @@ public class StudentDashboard extends JFrame {
         welcomePanel.add(welcomeLabel, BorderLayout.NORTH);
         panel.add(welcomePanel, BorderLayout.NORTH);
 
-        // Stats cards based on quizzes, classes, assignments from DataManager
+        // Stats cards based on assigned quizzes, classes, assignments
         JPanel statsPanel = new JPanel(new GridLayout(1, 3, 15, 15));
         statsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
         statsPanel.setBackground(backgroundColor);
@@ -200,7 +199,7 @@ public class StudentDashboard extends JFrame {
         topPanel.add(titleLabel);
         card.add(topPanel, BorderLayout.NORTH);
 
-        // Center panel with dynamic count
+        // Center panel with count
         JLabel countLabel = new JLabel(String.valueOf(count), JLabel.CENTER);
         countLabel.setFont(new Font("Arial", Font.BOLD, 36));
         countLabel.setForeground(Color.WHITE);
@@ -470,7 +469,8 @@ public class StudentDashboard extends JFrame {
     }
 
     private void updateDashboardStats() {
-        // For simplicity, we repaint the frame.
+        // For simplicity simply repaint the frame; you may also update counts
+        // dynamically here.
         repaint();
     }
 
@@ -563,27 +563,30 @@ public class StudentDashboard extends JFrame {
         }
     }
 
-    // Custom button style all in blue (or the provided color)
+    // Custom button style all in blue
     private JButton createStyledButton(String text, Color color) {
-        // Use the provided color for the button
+        // In this update, we set all buttons to use the same blue color regardless of
+        // the passed color.
+        // This ensures a blue theme for all buttons.
+        Color blueColor = primaryColor;
         JButton button = new JButton(text);
         button.setFont(buttonFont);
-        button.setBackground(color);
+        button.setBackground(blueColor);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(new CompoundBorder(
-                BorderFactory.createLineBorder(color.darker(), 2),
+                BorderFactory.createLineBorder(blueColor.darker(), 2),
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)));
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(color.brighter());
+                button.setBackground(blueColor.brighter());
                 button.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(color);
+                button.setBackground(blueColor);
                 button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
@@ -594,7 +597,7 @@ public class StudentDashboard extends JFrame {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(button.getBackground());
                 g2.fillRoundRect(0, 0, button.getWidth(), button.getHeight(), 20, 20);
-                g2.setColor(color.darker());
+                g2.setColor(blueColor.darker());
                 g2.drawRoundRect(0, 0, button.getWidth() - 1, button.getHeight() - 1, 20, 20);
                 FontMetrics fm = g2.getFontMetrics();
                 Rectangle stringBounds = fm.getStringBounds(button.getText(), g2).getBounds();

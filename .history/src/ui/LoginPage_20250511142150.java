@@ -134,7 +134,7 @@ public class LoginPage extends JFrame {
                 if (user != null) {
                     openDashboard(user);
                 } else {
-                    // Debug output to console (remove in production)
+                    // Debug output to console for credentials (remove in production)
                     System.out.println("DEBUG: Login failed for user: " + username);
                     JOptionPane.showMessageDialog(LoginPage.this,
                             "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);

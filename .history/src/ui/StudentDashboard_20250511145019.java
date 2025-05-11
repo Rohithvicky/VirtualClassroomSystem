@@ -22,8 +22,8 @@ public class StudentDashboard extends JFrame {
     private User user;
 
     // Styling variables
-    private Color primaryColor = new Color(25, 100, 200); // Blue color (used for header, dashboard, etc.)
-    private Color accentColor = new Color(65, 135, 245); // Brighter blue if needed
+    private Color primaryColor = new Color(25, 100, 200); // Darker blue
+    private Color accentColor = new Color(65, 135, 245); // Brighter blue
     private Color backgroundColor = new Color(240, 248, 255); // Alice blue
     private Font titleFont = new Font("Arial", Font.BOLD, 16);
     private Font regularFont = new Font("Arial", Font.PLAIN, 14);
@@ -86,7 +86,6 @@ public class StudentDashboard extends JFrame {
         tabbedPane.addTab("Classes", classesIcon, classesPanel);
         tabbedPane.addTab("Quizzes", quizIcon, quizzesPanel);
         tabbedPane.addTab("Assignments", assignmentIcon, assignmentsPanel);
-
         add(tabbedPane, BorderLayout.CENTER);
 
         // Status bar
@@ -108,7 +107,7 @@ public class StudentDashboard extends JFrame {
         headerPanel.setBackground(primaryColor);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Left panel for avatar and welcome message
+        // Left side - Welcome message and avatar
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         leftPanel.setBackground(primaryColor);
         ImageIcon avatarIcon;
@@ -120,15 +119,16 @@ public class StudentDashboard extends JFrame {
         }
         JLabel avatarLabel = new JLabel(avatarIcon);
         avatarLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
         JLabel welcomeLabel = new JLabel("Welcome, " + user.getUsername() + "!");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         welcomeLabel.setForeground(Color.WHITE);
+
         leftPanel.add(avatarLabel);
         leftPanel.add(welcomeLabel);
         headerPanel.add(leftPanel, BorderLayout.WEST);
 
-        // Right side - Logout button as red
-        // Using red color: new Color(220, 53, 69)
+        // Right side - Logout button
         JButton logoutButton = createStyledButton("Logout", new Color(220, 53, 69));
         try {
             logoutButton.setIcon(new ImageIcon(getClass().getResource("/icons/logout.png")));
@@ -166,7 +166,7 @@ public class StudentDashboard extends JFrame {
         welcomePanel.add(welcomeLabel, BorderLayout.NORTH);
         panel.add(welcomePanel, BorderLayout.NORTH);
 
-        // Stats cards based on quizzes, classes, assignments from DataManager
+        // Stats cards
         JPanel statsPanel = new JPanel(new GridLayout(1, 3, 15, 15));
         statsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
         statsPanel.setBackground(backgroundColor);
@@ -200,20 +200,21 @@ public class StudentDashboard extends JFrame {
         topPanel.add(titleLabel);
         card.add(topPanel, BorderLayout.NORTH);
 
-        // Center panel with dynamic count
+        // Center panel with count
         JLabel countLabel = new JLabel(String.valueOf(count), JLabel.CENTER);
         countLabel.setFont(new Font("Arial", Font.BOLD, 36));
         countLabel.setForeground(Color.WHITE);
         card.add(countLabel, BorderLayout.CENTER);
 
-        // Bottom panel with "View All" button styled in blue
-        JButton viewButton = createStyledButton("View All", primaryColor);
-        viewButton.setBorder(BorderFactory.createLineBorder(primaryColor.darker(), 1));
+        // Bottom panel with "View All" button styled as dark
+        JButton viewButton = createStyledButton("View All", new Color(30, 30, 30));
+        viewButton.setBorder(BorderFactory.createLineBorder(new Color(30, 30, 30), 1));
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(color);
         buttonPanel.add(viewButton);
         card.add(buttonPanel, BorderLayout.SOUTH);
 
+        // Action for view button to switch between tabs based on title
         viewButton.addActionListener(e -> {
             switch (title) {
                 case "Classes":
@@ -254,13 +255,13 @@ public class StudentDashboard extends JFrame {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // Button panel
+        // Button panel for class actions
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.setBackground(backgroundColor);
-        JButton refreshButton = createStyledButton("Refresh", primaryColor);
+        JButton refreshButton = createStyledButton("Refresh", new Color(30, 30, 30));
         refreshButton.setIcon(getSafeIcon("/icons/refresh.png"));
         refreshButton.addActionListener(e -> loadData());
-        JButton joinButton = createStyledButton("Join Class", primaryColor);
+        JButton joinButton = createStyledButton("Join Class", new Color(30, 30, 30));
         joinButton.setIcon(getSafeIcon("/icons/join.png"));
         joinButton.addActionListener(e -> {
             String selected = classList.getSelectedValue();
@@ -346,13 +347,13 @@ public class StudentDashboard extends JFrame {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // Button panel
+        // Button panel for quiz actions
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.setBackground(backgroundColor);
-        JButton refreshButton = createStyledButton("Refresh", primaryColor);
+        JButton refreshButton = createStyledButton("Refresh", new Color(30, 30, 30));
         refreshButton.setIcon(getSafeIcon("/icons/refresh.png"));
         refreshButton.addActionListener(e -> loadData());
-        JButton takeButton = createStyledButton("Take Quiz", primaryColor);
+        JButton takeButton = createStyledButton("Take Quiz", new Color(30, 30, 30));
         takeButton.setIcon(getSafeIcon("/icons/start.png"));
         takeButton.addActionListener(e -> {
             String selected = quizList.getSelectedValue();
@@ -395,13 +396,13 @@ public class StudentDashboard extends JFrame {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // Button panel
+        // Button panel for assignment actions
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.setBackground(backgroundColor);
-        JButton refreshButton = createStyledButton("Refresh", primaryColor);
+        JButton refreshButton = createStyledButton("Refresh", new Color(30, 30, 30));
         refreshButton.setIcon(getSafeIcon("/icons/refresh.png"));
         refreshButton.addActionListener(e -> loadData());
-        JButton submitButton = createStyledButton("Submit", primaryColor);
+        JButton submitButton = createStyledButton("Submit", new Color(30, 30, 30));
         submitButton.setIcon(getSafeIcon("/icons/upload.png"));
         submitButton.addActionListener(e -> {
             String selected = assignmentList.getSelectedValue();
@@ -459,19 +460,16 @@ public class StudentDashboard extends JFrame {
         quizListModel.clear();
         assignmentListModel.clear();
 
-        // Load classes
+        // Load classes using getClasses() which returns a list of display strings.
         dm.getClasses().forEach(classListModel::addElement);
-        // Load quizzes
+
+        // Load quizzes using Quiz objects so we can get the titles
         dm.getQuizzesObj().forEach(quiz -> quizListModel.addElement(quiz.getTitle()));
-        // Load assignments
+
+        // Load assignments using Assignment objects so we can get the titles
         dm.getAssignmentsObj().forEach(assignment -> assignmentListModel.addElement(assignment.getTitle()));
 
         updateDashboardStats();
-    }
-
-    private void updateDashboardStats() {
-        // For simplicity, we repaint the frame.
-        repaint();
     }
 
     private void takeQuiz(String quizTitle) {
@@ -533,7 +531,7 @@ public class StudentDashboard extends JFrame {
 
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
             buttonPanel.setBackground(Color.WHITE);
-            JButton submitButton = createStyledButton("Submit Quiz", primaryColor);
+            JButton submitButton = createStyledButton("Submit Quiz", new Color(30, 30, 30));
             submitButton.addActionListener(e -> {
                 int score = 0;
                 for (int i = 0; i < questions.size(); i++) {
@@ -563,55 +561,6 @@ public class StudentDashboard extends JFrame {
         }
     }
 
-    // Custom button style all in blue (or the provided color)
-    private JButton createStyledButton(String text, Color color) {
-        // Use the provided color for the button
-        JButton button = new JButton(text);
-        button.setFont(buttonFont);
-        button.setBackground(color);
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(new CompoundBorder(
-                BorderFactory.createLineBorder(color.darker(), 2),
-                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                button.setBackground(color.brighter());
-                button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                button.setBackground(color);
-                button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        });
-        button.setUI(new BasicButtonUI() {
-            @Override
-            public void paint(Graphics g, JComponent c) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(button.getBackground());
-                g2.fillRoundRect(0, 0, button.getWidth(), button.getHeight(), 20, 20);
-                g2.setColor(color.darker());
-                g2.drawRoundRect(0, 0, button.getWidth() - 1, button.getHeight() - 1, 20, 20);
-                FontMetrics fm = g2.getFontMetrics();
-                Rectangle stringBounds = fm.getStringBounds(button.getText(), g2).getBounds();
-                int textX = (button.getWidth() - stringBounds.width) / 2;
-                int textY = (button.getHeight() - stringBounds.height) / 2 + fm.getAscent();
-                g2.setColor(button.getForeground());
-                g2.drawString(button.getText(), textX, textY);
-            }
-        });
-        return button;
-    }
-
-    // Simple method to validate a Google Meet link format
-    private boolean isValidGoogleMeetLink(String link) {
-        return link != null && link.matches("^(https?:\\/\\/)?meet\\.google\\.com\\/[a-zA-Z0-9\\-]+$");
-    }
-
     private JPanel createStatusBar() {
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBackground(new Color(237, 242, 247));
@@ -623,7 +572,6 @@ public class StudentDashboard extends JFrame {
         return statusBar;
     }
 
-    // Custom list renderers
     private class CustomListCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -644,39 +592,23 @@ public class StudentDashboard extends JFrame {
         }
     }
 
-    // Renderer for quiz list; similar to custom list renderer
-    private class QuizListRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-            if (isSelected) {
-                label.setBackground(accentColor);
-                label.setForeground(Color.WHITE);
+    private void loadData() {
+        DataManager dm = DataManager.getInstance();
+        classListModel.clear();
+        dm.getClasses().forEach(classListModel::addElement);
+        quizListModel.clear();
+        dm.getQuizzes().forEach(quiz -> {
+            if (!quiz.contains(" - Due: ")) {
+                quizListModel.addElement(quiz + " - Due: " + LocalDate.now());
             } else {
-                label.setBackground(Color.WHITE);
-                label.setForeground(Color.BLACK);
+                quizListModel.addElement(quiz);
             }
-            return label;
-        }
+        });
+        assignmentListModel.clear();
+        dm.getAssignments().forEach(assignmentListModel::addElement);
     }
 
-    // Renderer for assignment list; similar to quiz renderer
-    private class AssignmentListRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-            if (isSelected) {
-                label.setBackground(accentColor);
-                label.setForeground(Color.WHITE);
-            } else {
-                label.setBackground(Color.WHITE);
-                label.setForeground(Color.BLACK);
-            }
-            return label;
-        }
+    private void updateDashboardStats() {
+        repaint();
     }
 }

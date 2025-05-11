@@ -463,7 +463,6 @@ public class TeacherDashboard extends JFrame {
             JTextArea descriptionArea = new JTextArea(3, 20);
             descriptionArea.setLineWrap(true);
             descriptionArea.setWrapStyleWord(true);
-            // Populate class selector with actual class names
             classSelector.addItem("No Class");
             for (int i = 0; i < classListModel.getSize(); i++) {
                 String className = classListModel.getElementAt(i).split(" - ")[0];
@@ -614,7 +613,6 @@ public class TeacherDashboard extends JFrame {
     private void loadData() {
         DataManager dm = DataManager.getInstance();
         classListModel.clear();
-        // Use the getClasses() method that returns a list of display strings
         dm.getClasses().forEach(classListModel::addElement);
         loadQuizzesFromDatabase();
         assignmentListModel.clear();

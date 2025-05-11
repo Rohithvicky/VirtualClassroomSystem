@@ -134,7 +134,8 @@ public class LoginPage extends JFrame {
                 if (user != null) {
                     openDashboard(user);
                 } else {
-                    // Debug output to console (remove in production)
+                    // Debug output: print entered credentials (for testing purposes only; do not do
+                    // in production)
                     System.out.println("DEBUG: Login failed for user: " + username);
                     JOptionPane.showMessageDialog(LoginPage.this,
                             "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
@@ -193,14 +194,14 @@ public class LoginPage extends JFrame {
             stmt.setString(1, username);
             stmt.setString(2, password);
 
-            // Debug output: display query details in console
-            System.out.println("DEBUG: Executing query with username: " + username);
+            // Debug output: show the query execution
+            System.out.println("DEBUG: Executing query: " + sql + " with username: " + username);
 
             rs = stmt.executeQuery();
             if (rs.next()) {
                 int id = rs.getInt("id");
                 String role = rs.getString("role");
-                // Debug output: user authenticated
+                // Debug output: user found
                 System.out.println("DEBUG: User authenticated: " + username + ", role: " + role);
                 return new User(id, username, role);
             }
