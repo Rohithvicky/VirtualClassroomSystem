@@ -228,7 +228,7 @@ public class DataManager {
         return getQuizQuestions(quizId);
     }
 
-    // Get all classes as a list of display strings (removed Course.java usage)
+    // NEW: Get all classes as a list of display strings (removed Course.java usage)
     public List<String> getClasses() {
         List<String> classes = new ArrayList<>();
         Connection conn = null;
@@ -549,28 +549,24 @@ public class DataManager {
     }
 
     // Add an assignment with a description.
-    // Handles cases with or without a class_id.
+    // If classId is -1, explicitly set it to NULL in the database.
     public boolean addAssignment(String title, int classId, LocalDate dueDate, String description) {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
             conn = DBConnection.getConnection();
-            String sql;
-            // Use different SQL statements based on whether a class ID exists.
+            String sql = "INSERT INTO assignments (title, class_id, due_date, description) VALUES (?, ?, ?, ?)";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, title);
+
             if (classId == -1) {
-                sql = "INSERT INTO assignments (title, due_date, description) VALUES (?, ?, ?)";
-                stmt = conn.prepareStatement(sql);
-                stmt.setString(1, title);
-                stmt.setDate(2, java.sql.Date.valueOf(dueDate));
-                stmt.setString(3, description);
+                stmt.setNull(2, java.sql.Types.INTEGER);
             } else {
-                sql = "INSERT INTO assignments (title, class_id, due_date, description) VALUES (?, ?, ?, ?)";
-                stmt = conn.prepareStatement(sql);
-                stmt.setString(1, title);
                 stmt.setInt(2, classId);
-                stmt.setDate(3, java.sql.Date.valueOf(dueDate));
-                stmt.setString(4, description);
             }
+
+            stmt.setDate(3, java.sql.Date.valueOf(dueDate));
+            stmt.setString(4, description);
 
             int rowsInserted = stmt.executeUpdate();
             return rowsInserted > 0;
