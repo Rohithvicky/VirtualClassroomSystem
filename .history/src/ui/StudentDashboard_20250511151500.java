@@ -21,11 +21,6 @@ public class StudentDashboard extends JFrame {
     private DefaultListModel<String> assignmentListModel;
     private User user;
 
-    // Instance variables for dashboard count labels so they can be updated
-    private JLabel classesCountLabel;
-    private JLabel quizzesCountLabel;
-    private JLabel assignmentsCountLabel;
-
     // Styling variables
     private Color primaryColor = new Color(25, 100, 200); // Blue color (used for header, dashboard, etc.)
     private Color accentColor = new Color(65, 135, 245); // Brighter blue if needed
@@ -62,7 +57,7 @@ public class StudentDashboard extends JFrame {
         initializeComponents();
         loadData();
 
-        // Refresh data automatically every 30 seconds.
+        // Updated fix: Refresh data automatically every 30 seconds.
         new javax.swing.Timer(30000, e -> loadData()).start();
 
         setVisible(true);
@@ -137,6 +132,7 @@ public class StudentDashboard extends JFrame {
         headerPanel.add(leftPanel, BorderLayout.WEST);
 
         // Right side - Logout button as red
+        // Using red color: new Color(220, 53, 69)
         JButton logoutButton = createStyledButton("Logout", new Color(220, 53, 69));
         try {
             logoutButton.setIcon(new ImageIcon(getClass().getResource("/icons/logout.png")));
@@ -178,19 +174,18 @@ public class StudentDashboard extends JFrame {
         JPanel statsPanel = new JPanel(new GridLayout(1, 3, 15, 15));
         statsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
         statsPanel.setBackground(backgroundColor);
-
-        // Create cards and save count labels to update later
-        statsPanel.add(createDashboardCard("Classes", new Color(70, 130, 180), "/icons/class.png"));
-        statsPanel.add(createDashboardCard("Quizzes", new Color(60, 179, 113), "/icons/quiz.png"));
-        statsPanel.add(createDashboardCard("Assignments", new Color(218, 165, 32), "/icons/assignment.png"));
-
+        statsPanel.add(
+                createDashboardCard("Classes", classListModel.size(), new Color(70, 130, 180), "/icons/class.png"));
+        statsPanel
+                .add(createDashboardCard("Quizzes", quizListModel.size(), new Color(60, 179, 113), "/icons/quiz.png"));
+        statsPanel.add(createDashboardCard("Assignments", assignmentListModel.size(), new Color(218, 165, 32),
+                "/icons/assignment.png"));
         panel.add(statsPanel, BorderLayout.CENTER);
 
         return panel;
     }
 
-    // Updated dashboard card that initializes the count label
-    private JPanel createDashboardCard(String title, Color color, String iconPath) {
+    private JPanel createDashboardCard(String title, int count, Color color, String iconPath) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(color);
         card.setBorder(new CompoundBorder(
@@ -209,20 +204,11 @@ public class StudentDashboard extends JFrame {
         topPanel.add(titleLabel);
         card.add(topPanel, BorderLayout.NORTH);
 
-        // Center panel with dynamic count; create and save the label based on card type
-        JLabel countLabel = new JLabel("0", JLabel.CENTER);
+        // Center panel with dynamic count
+        JLabel countLabel = new JLabel(String.valueOf(count), JLabel.CENTER);
         countLabel.setFont(new Font("Arial", Font.BOLD, 36));
         countLabel.setForeground(Color.WHITE);
         card.add(countLabel, BorderLayout.CENTER);
-
-        // Save the label reference for later updates
-        if (title.equals("Classes")) {
-            classesCountLabel = countLabel;
-        } else if (title.equals("Quizzes")) {
-            quizzesCountLabel = countLabel;
-        } else if (title.equals("Assignments")) {
-            assignmentsCountLabel = countLabel;
-        }
 
         // Bottom panel with "View All" button styled in blue
         JButton viewButton = createStyledButton("View All", primaryColor);
@@ -471,7 +457,6 @@ public class StudentDashboard extends JFrame {
         }
     }
 
-    // Update loadData to update both list models and dashboard counts.
     private void loadData() {
         DataManager dm = DataManager.getInstance();
         classListModel.clear();
@@ -488,18 +473,8 @@ public class StudentDashboard extends JFrame {
         updateDashboardStats();
     }
 
-    // Update dashboard counters using the instance variables
     private void updateDashboardStats() {
-        if (classesCountLabel != null) {
-            classesCountLabel.setText(String.valueOf(classListModel.size()));
-        }
-        if (quizzesCountLabel != null) {
-            quizzesCountLabel.setText(String.valueOf(quizListModel.size()));
-        }
-        if (assignmentsCountLabel != null) {
-            assignmentsCountLabel.setText(String.valueOf(assignmentListModel.size()));
-        }
-        // Force a repaint to ensure UI updates are visible
+        // For simplicity, we repaint the frame.
         repaint();
     }
 
@@ -594,6 +569,7 @@ public class StudentDashboard extends JFrame {
 
     // Custom button style all in blue (or the provided color)
     private JButton createStyledButton(String text, Color color) {
+        // Use the provided color for the button
         JButton button = new JButton(text);
         button.setFont(buttonFont);
         button.setBackground(color);
